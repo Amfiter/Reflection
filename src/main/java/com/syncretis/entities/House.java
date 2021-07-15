@@ -5,17 +5,16 @@ import com.syncretis.abstractions.FieldName;
 import java.util.StringJoiner;
 
 public class House {
-    @FieldName("House number")
+    @FieldName("house number")
     int id;
-    @FieldName("House dfdfd")
-    String color;
+    String location;
 
     public House() {
     }
 
-    public House(String color,int id) {
+    public House(String location,int id) {
         this.id = id;
-        this.color = color;
+        this.location = location;
     }
 
     public int getId() {
@@ -23,14 +22,14 @@ public class House {
     }
 
     public String getColor() {
-        return color;
+        return location;
     }
 
     @Override
     public String toString() {
         return new StringJoiner(", ", House.class.getSimpleName() + "[", "]")
                 .add("id=" + id)
-                .add("color='" + color + "'")
+                .add("location='" + location + "'")
                 .toString();
     }
 }
