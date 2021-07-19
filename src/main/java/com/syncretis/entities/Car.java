@@ -5,11 +5,14 @@ import com.syncretis.abstractions.FieldName;
 import java.util.StringJoiner;
 
 public class Car {
-    String id;
-    String color;
-    String carBrand;
+    private String id;
+    private String color;
+    private String carBrand;
 
-    public Car(String id, String color,String carBrand) {
+    public Car() {
+    }
+
+    public Car(String id, String color, String carBrand) {
         this.id = id;
         this.color = color;
         this.carBrand = carBrand;
@@ -20,6 +23,7 @@ public class Car {
         return new StringJoiner(", ", Car.class.getSimpleName() + "[", "]")
                 .add("id='" + id + "'")
                 .add("color='" + color + "'")
+                .add("carBrand='" + carBrand + "'")
                 .toString();
     }
 }

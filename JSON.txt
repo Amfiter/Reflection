@@ -1,0 +1,13 @@
+{
+	"Nickname" : "Vova",
+	"PhoneNumber" : 9991773700
+},
+{
+	"HouseNumber" : 14,
+	"location" : "Vershinina street"
+},
+{
+	"id" : "32424",
+	"color" : "Red",
+	"carBrand" : "Lamborghini"
+}

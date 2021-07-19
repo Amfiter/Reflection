@@ -8,12 +8,13 @@ import com.syncretis.parser.Parser;
 import com.syncretis.utils.FileWrite;
 import com.syncretis.utils.Style;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
 
-    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException {
+    public static void main(String[] args) throws NoSuchFieldException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
         FileWrite fileWriter = new FileWrite();
         Style style = new Style();
 
@@ -26,11 +27,24 @@ public class Main {
         list.add(house);
         list.add(car);
 
+        Parser<Object> parser = new Parser<>();
+
+        StringBuilder personString = parser.serialize(person);
+        StringBuilder houseString = parser.serialize(house);
+        StringBuilder carString = parser.serialize(car);
+
+        System.out.println(personString);
+        System.out.println(houseString);
+        System.out.println(carString);
+
+        parser.deserialize(personString,Person.class);
+        parser.deserialize(houseString,House.class);
+        parser.deserialize(carString,Car.class);
+
+
         for (int i = 0; i < list.size(); i++) {
-            Parser<Object> parser = new Parser<>();
             StringBuilder finishString = parser.serialize(list.get(i));
             style.commonBetweenObjects(list,i,finishString);
-            System.out.println(finishString);
             fileWriter.writeToJson(finishString);
         }
     }

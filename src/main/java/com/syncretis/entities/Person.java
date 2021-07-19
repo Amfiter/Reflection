@@ -5,9 +5,9 @@ import com.syncretis.abstractions.FieldName;
 import java.util.StringJoiner;
 
 public class Person {
-    @FieldName("nickname")
+    @FieldName("Nickname")
     private String name;
-    @FieldName("phone number")
+    @FieldName("PhoneNumber")
     private long phoneNumber ;
 
 

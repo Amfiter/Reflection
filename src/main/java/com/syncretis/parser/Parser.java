@@ -7,6 +7,7 @@ import com.syncretis.utils.Style;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,8 +28,6 @@ public class Parser<T> {
                 style.common(i, count, tempString);
                 finishString.append(tempString);
             } else if (checks.isNumericOrNot(fields[i])) {
-                /*String.valueOf(fields[i]);
-                System.out.println(fields[i]);*/
                 StringBuilder tempString = new StringBuilder();
                 tempString.append(style.styleJsonForNumbers(fields[i], object));
                 style.common(i, count, tempString);
@@ -38,53 +37,53 @@ public class Parser<T> {
         return finishString;
     }
 
-    public <T> T deserialize(Map<String, String> stringFields, Class<T> type) throws IllegalAccessException, InstantiationException, NoSuchMethodException, InvocationTargetException {
-        Constructor<T> constructor = type.getConstructor();
-        T instance = constructor.newInstance();
+    public <T> T deserialize(StringBuilder str, Class<T> clazz) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
-        Field[] fields = instance.getClass().getDeclaredFields();
+        Constructor<T> constructor = clazz.getConstructor();
+        T obj = constructor.newInstance();
+        HashMap<String, String> stringMap = splitText(str.toString());
 
-        for (Field field : fields) {
+        Field[] fields = obj.getClass().getDeclaredFields();
+        for (int i = 0; i < fields.length; i++) {
+            Field field = fields[i];
             field.setAccessible(true);
-            Object fieldType = field.getType();
-            FieldName annotation = field.getDeclaredAnnotation(FieldName.class);
-
-            if (!Objects.isNull(annotation)) {
-                if(stringFields.containsKey(annotation.value())) {
-                    setStringFieldToInstance(field, stringFields.get(annotation.value()),instance);
-                } else {
-                    field.set(instance, stringFields.get(field.getName()));
+            for (Map.Entry<String, String> entry : stringMap.entrySet()) {
+                if (compareFields(field, entry.getKey()) && field.getType().equals(String.class)) {
+                    field.set(obj, entry.getValue());
+                } else if (compareFields(field, entry.getKey()) && field.getType().equals(long.class)) {
+                    field.set(obj, Long.valueOf(entry.getValue()));
+                } else if (compareFields(field, entry.getKey()) && field.getType().equals(int.class)) {
+                    field.set(obj, Integer.valueOf(entry.getValue()));
+                } else if (compareFields(field, entry.getKey()) && field.getType().equals(double.class)) {
+                    field.set(obj, Double.valueOf(entry.getValue()));
+                } else if (compareFields(field, entry.getKey()) && field.getType().equals(boolean.class)) {
+                    field.set(obj, Boolean.valueOf(entry.getValue()));
                 }
-            } else {
-                field.set(instance, stringFields.get(field.getName()));
             }
         }
-        return instance;
+        System.out.println("Object from JSON: " + obj);
+        return obj;
     }
 
-    public void setStringFieldToInstance(Field field, String fieldValue, Object instance) throws IllegalAccessException {
-        if(!(field.getType() == String.class)){
-            Object objValue = parseTypeFromString(field.getType(), fieldValue);
-            field.set(instance, objValue);
-        } else{
-            field.set(instance, fieldValue);
+    private boolean compareFields(Field field, String str) {
+        if (str.equals(field.getName())) {
+            return true;
+        } else if (Objects.isNull(field.getAnnotation(FieldName.class))) {
+            return false;
+        } else if (str.equals(field.getAnnotation(FieldName.class).value())) {
+            return true;
         }
+        return false;
     }
 
-    public Object parseTypeFromString(Class clazz, String value){
-        if(Boolean.class == clazz ) {
-            return Boolean.parseBoolean(value);
+    private HashMap<String, String> splitText(String text) {
+        HashMap<String, String> map = new HashMap<>();
+        String[] fieldsText = text.split(",\n");
+        for (String fieldText : fieldsText) {
+            fieldText = fieldText.replaceAll("[{}\" \n\t]", "");
+            String[] str = fieldText.split(":");
+            map.put(str[0], str[1]);
         }
-        if(Integer.class == clazz || Integer.TYPE == clazz) {
-            return Integer.parseInt(value);
-        }
-        if(Long.class == clazz) {
-            return Long.parseLong(value);
-        }
-        if(Double.class == clazz) {
-            return Double.parseDouble(value);
-        }
-        return value;
+        return map;
     }
-
 }

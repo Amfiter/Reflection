@@ -5,9 +5,9 @@ import com.syncretis.abstractions.FieldName;
 import java.util.StringJoiner;
 
 public class House {
-    @FieldName("house number")
-    int id;
-    String location;
+    @FieldName("HouseNumber")
+    private int id;
+    private String location;
 
     public House() {
     }
